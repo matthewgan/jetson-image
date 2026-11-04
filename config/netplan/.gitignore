@@ -1,0 +1,6 @@
+# Ignore everything in this directory (WiFi credentials live here)
+*
+# Except these files
+!.gitignore
+!01-ethernet.yaml
+!50-wifi.yaml.example
