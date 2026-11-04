@@ -1,0 +1,13 @@
+# Copy to 50-wifi.yaml (gitignored) and fill in your network.
+network:
+  version: 2
+  renderer: networkd
+  wifis:
+    wlan0:
+      dhcp4: true
+      optional: true
+      access-points:
+        "YOUR_SSID":
+          auth:
+            key-management: psk
+            password: "YOUR_PASSWORD"

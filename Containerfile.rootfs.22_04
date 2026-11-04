@@ -85,15 +85,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y \
         python-is-python3 \
         git \
         fwupd \
-        iwd
+        wpasupplicant \
+        netplan.io \
+        iw \
+        wireless-regdb
 
 # Tegratop
 RUN wget -q https://github.com/pythops/tegratop/releases/latest/download/tegratop-linux-arm64 -O /usr/local/bin/tegratop && \
     chmod +x /usr/local/bin/tegratop
-
-# Impala
-RUN wget -q https://github.com/pythops/impala/releases/latest/download/impala-aarch64-unknown-linux-musl  -O /usr/local/bin/impala && \
-    chmod +x /usr/local/bin/impala
 
 # Resize the rootfs
 COPY scripts/resizerootfs.sh /usr/local/bin
@@ -104,12 +103,14 @@ RUN locale-gen en_US.UTF-8
 
 # Enable services at startuo
 RUN systemctl enable resizerootfs.service && \
-    systemctl enable systemd-timesyncd && \
-    systemctl enable iwd
+    systemctl enable systemd-timesyncd
 
-# WiFi Networks config
-COPY config/iwd/networks/* /var/lib/iwd/
-COPY config/iwd/main.conf /etc/iwd/main.conf
+# Network config (netplan -> systemd-networkd + wpa_supplicant).
+# iwd is not used here: on a Jetson Nano (L4T 32.7.6, kernel 4.9) it never came up (D-Bus activation timeout).
+# Keep kernel names (wlan0) for WiFi, otherwise USB adapters become wlx<mac>.
+COPY config/systemd/10-wlan-kernel-name.link /etc/systemd/network/
+COPY config/netplan/*.yaml /etc/netplan/
+RUN chmod 600 /etc/netplan/*.yaml
 
 # New user
 # username: jetson
